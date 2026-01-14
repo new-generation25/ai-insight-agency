@@ -13,15 +13,6 @@ class Manager {
     }
 
     async callGemini(systemPrompt, userMessage) {
-        const apiKey = getApiKey();
-
-        if (!apiKey) {
-            console.error("API Key missing");
-            return "⚠️ API 키가 설정되지 않았습니다. 설정 버튼을 눌러 Gemini API 키를 입력해주세요.";
-        }
-
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
-
         // 대화 기록을 API 형식으로 변환
         const historyForAPI = this.state.conversation_history.map(msg => ({
             role: msg.role === 'user' ? 'user' : 'model',
@@ -47,11 +38,27 @@ class Manager {
         };
 
         try {
-            const response = await fetch(url, {
+            // 1. 먼저 서버리스 API 시도 (Vercel 배포 시)
+            let response = await fetch('/api/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
             });
+
+            // 서버리스 API가 없으면 (로컬 개발 시) 직접 호출
+            if (!response.ok && response.status === 404) {
+                const apiKey = getApiKey();
+                if (!apiKey) {
+                    return "⚠️ API 키가 설정되지 않았습니다.";
+                }
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+                response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+            }
+
             const data = await response.json();
 
             if (!data.candidates || data.candidates.length === 0) {
