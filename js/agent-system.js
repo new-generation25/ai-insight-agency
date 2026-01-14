@@ -1,5 +1,5 @@
 import { AGENT_PROMPTS } from './agent-prompts.js';
-import { CONFIG } from '../config.js';
+import { CONFIG, getApiKey } from '../config.js';
 
 class Manager {
     constructor() {
@@ -13,12 +13,14 @@ class Manager {
     }
 
     async callGemini(systemPrompt, userMessage) {
-        if (CONFIG.GEMINI_API_KEY === 'YOUR_API_KEY_HERE') {
+        const apiKey = getApiKey();
+
+        if (!apiKey) {
             console.error("API Key missing");
-            return "API 키가 설정되지 않았습니다. config.js를 확인해주세요.";
+            return "⚠️ API 키가 설정되지 않았습니다. 설정 버튼을 눌러 Gemini API 키를 입력해주세요.";
         }
 
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${CONFIG.GEMINI_API_KEY}`;
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
 
         // 대화 기록을 API 형식으로 변환
         const historyForAPI = this.state.conversation_history.map(msg => ({
