@@ -11,6 +11,13 @@ export const DriveAPI = {
     // Initialize the API
     init: async () => {
         return new Promise((resolve, reject) => {
+            // CLIENT_ID가 없으면 Drive 기능 비활성화
+            if (!CONFIG.DRIVE_CLIENT_ID) {
+                console.log("Drive API disabled: No client ID configured");
+                resolve(false);
+                return;
+            }
+
             if (typeof gapi === 'undefined' || typeof google === 'undefined') {
                 console.warn("Google API scripts not loaded yet.");
                 resolve(false);
@@ -36,7 +43,7 @@ export const DriveAPI = {
                 console.log("Token Client Initialized");
             } catch (err) {
                 console.error("GIS Init Error", err);
-                if (window.addMessage) window.addMessage('system', `❌ 인증 모듈 초기화 실패: ${err.message}`);
+                // 오류 메시지를 UI에 표시하지 않음 (Drive 기능은 선택적)
             }
 
             // 2. Load GAPI client (Optional for Raw REST, but good for context)
