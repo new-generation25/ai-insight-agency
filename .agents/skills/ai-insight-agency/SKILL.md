@@ -51,6 +51,17 @@ MAX는 상황에 따라 다음 역할들을 자연스럽게 수행합니다:
 
 ---
 
+## 요청 단계 요약
+
+| 요청 단계 | 설명 |
+| :--- | :--- |
+| **Analysis** | 공고문 또는 요청 사항을 분석하여 핵심 정보 추출 |
+| **Interview** | 부족한 정보(예산, 대상 등)를 채우기 위한 질문 수행 |
+| **Drafting** | 수집된 정보를 바탕으로 기획서 초안 작성 |
+| **Review** | 완성된 기획서의 논리적 허점을 찾아내고 수정 제안 |
+
+---
+
 ## 워크플로우 (Workflow)
 
 ```mermaid
@@ -72,7 +83,7 @@ graph LR
 ## 구현 파일
 
 | 파일 | 설명 |
-|-----|------|
+| :--- | :--- |
 | [agent-prompts.js](file:///f:/projects/ai-assistant/js/agent-prompts.js) | MAX 통합 프롬프트 |
 | [agent-system.js](file:///f:/projects/ai-assistant/js/agent-system.js) | 간소화된 Manager 클래스 |
 | [main.js](file:///f:/projects/ai-assistant/js/main.js) | UI 이벤트 핸들러 |
