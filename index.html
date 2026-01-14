@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Insight Agency</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Sidebar: Agent Status -->
+        <aside class="sidebar">
+            <div class="logo-area">
+                <h1>AI Agency</h1>
+                <p>Intelligent Planning Partner</p>
+            </div>
+
+            <div class="agent-status-panel">
+                <h3>기획 진행 단계</h3>
+                <ul class="agent-list">
+                    <li class="agent-item active" id="step-setup">
+                        <span class="icon">🚀</span>
+                        <div class="info">
+                            <span class="name">시작</span>
+                            <span class="status">진행 중</span>
+                        </div>
+                    </li>
+                    <li class="agent-item" id="step-analysis">
+                        <span class="icon">📂</span>
+                        <div class="info">
+                            <span class="name">분석</span>
+                            <span class="status">대기</span>
+                        </div>
+                    </li>
+                    <li class="agent-item" id="step-interview">
+                        <span class="icon">💬</span>
+                        <div class="info">
+                            <span class="name">인터뷰</span>
+                            <span class="status">대기</span>
+                        </div>
+                    </li>
+                    <li class="agent-item" id="step-drafting">
+                        <span class="icon">✍️</span>
+                        <div class="info">
+                            <span class="name">초안 작성</span>
+                            <span class="status">대기</span>
+                        </div>
+                    </li>
+                    <li class="agent-item" id="step-refinement">
+                        <span class="icon">✨</span>
+                        <div class="info">
+                            <span class="name">다듬기</span>
+                            <span class="status">대기</span>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="file-drop-zone" id="drop-zone">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <p>Drop RFP/Docs here</p>
+                <input type="file" id="file-input" hidden>
+            </div>
+        </aside>
+
+        <!-- Main Chat Area -->
+        <main class="chat-interface">
+            <header class="chat-header">
+                <h2>Project Console</h2>
+                <div class="header-actions">
+                    <button id="btn-login" title="Connect Google Drive"><i class="fab fa-google"></i> Google
+                        Connect</button>
+                    <button id="btn-reset" title="Reset Session"><i class="fas fa-redo"></i></button>
+                    <button id="btn-save" title="Save to Drive"><i class="fab fa-google-drive"></i></button>
+                    <button id="btn-download" title="Download Markdown"><i class="fas fa-download"></i></button>
+                </div>
+            </header>
+
+            <div class="chat-history" id="chat-history">
+                <!-- Messages will appear here -->
+                <div class="message system">
+                    <div class="avatar">🎩</div>
+                    <div class="content">
+                        <p>안녕하세요! 저는 당신의 기획 파트너 <strong>MAX</strong>입니다. 🎩<br>
+                            멋진 프로젝트 기획, 저랑 같이 시작해 볼까요? 공고문 파일을 주시거나, 어떤 기획을 하고 싶은지 편하게 말씀해 주세요!</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="input-area">
+                <textarea id="user-input" placeholder="Type your message..." rows="1"></textarea>
+                <button id="btn-send"><i class="fas fa-paper-plane"></i></button>
+            </div>
+        </main>
+    </div>
+
+    <!-- Upload Progress Overlay -->
+    <div id="upload-overlay" class="upload-overlay" style="display: none;">
+        <div class="progress-box">
+            <h3>Uploading to Drive... 📂</h3>
+            <div class="progress-bar">
+                <div id="progress-fill" class="fill" style="width: 0%;"></div>
+            </div>
+            <p id="progress-text">0%</p>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script type="module" src="config.js"></script>
+    <!-- Placeholder for agent logic -->
+    <script type="module" src="js/agent-system.js"></script>
+    <script type="module" src="js/main.js"></script>
+</body>
+
+</html>
