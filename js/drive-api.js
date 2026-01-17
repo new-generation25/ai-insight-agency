@@ -216,6 +216,40 @@ export const DriveAPI = {
         } else {
             throw new Error(`Failed to get file content: ${response.status}`);
         }
+    },
+
+    // Simple Upload for Text/JSON (for main.js compatibility)
+    uploadFile: async (fileName, content, folderPath = 'AI_Agency_Projects') => {
+        if (!DriveAPI.accessToken) await DriveAPI.authenticate();
+
+        // Resolve folder path
+        const parts = folderPath.split('/');
+        let parentId = 'root';
+        for (const part of parts) {
+            parentId = await DriveAPI.getOrCreateFolder(part, parentId);
+        }
+
+        const metadata = {
+            name: fileName,
+            mimeType: 'application/json',
+            parents: [parentId]
+        };
+
+        const form = new FormData();
+        form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
+        form.append('file', new Blob([content], { type: 'application/json' }));
+
+        const response = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
+            method: 'POST',
+            headers: { 'Authorization': 'Bearer ' + DriveAPI.accessToken },
+            body: form
+        });
+
+        if (response.ok) {
+            return await response.json();
+        } else {
+            throw new Error(`Upload failed: ${response.status}`);
+        }
     }
 };
 
