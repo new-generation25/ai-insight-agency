@@ -162,7 +162,7 @@ class Manager {
         if (lower.includes('질문') || lower.includes('알려주') || lower.includes('어떤')) {
             this.state.current_phase = "인터뷰";
             if (window.updateProgressStage) window.updateProgressStage('interview');
-        } else if (lower.includes('# ') && lower.includes('##')) {
+        } else if (lower.includes('# ') && lower.includes('##') && (lower.includes('제안서') || lower.includes('기획서'))) {
             this.state.current_phase = "작성";
             if (window.updateProgressStage) window.updateProgressStage('drafting');
             this.state.draft = response;
