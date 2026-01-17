@@ -180,10 +180,47 @@ export const DriveAPI = {
         });
     },
 
-    // Simple Upload for Text/Markdown (Existing main.js compatibility)
-    uploadFile: async (fileName, content, folderName = 'AI_Agency_Projects') => {
-        const fileObj = new File([content], fileName, { type: 'text/markdown' });
-        return DriveAPI.uploadFileProgress(fileObj, folderName);
+    // List files in a specific folder
+    listFiles: async (folderName = 'AI_Agency_Projects/Logs') => {
+        if (!DriveAPI.accessToken) await DriveAPI.authenticate();
+
+        // Find folder ID first
+        let folderId = null;
+        if (folderName.includes('/')) {
+            const parts = folderName.split('/');
+            for (const part of parts) {
+                folderId = await DriveAPI.getOrCreateFolder(part);
+            }
+        } else {
+            folderId = await DriveAPI.getOrCreateFolder(folderName);
+        }
+
+        const q = `'${folderId}' in parents and trashed=false`;
+        const url = `https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(q)}&fields=files(id,name,mimeType,createdTime)&orderBy=createdTime desc`;
+
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: { 'Authorization': 'Bearer ' + DriveAPI.accessToken }
+        });
+        const data = await response.json();
+        return data.files || [];
+    },
+
+    // Get file content by ID
+    getFileContent: async (fileId) => {
+        if (!DriveAPI.accessToken) await DriveAPI.authenticate();
+        const url = `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`;
+
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: { 'Authorization': 'Bearer ' + DriveAPI.accessToken }
+        });
+
+        if (response.ok) {
+            return await response.json();
+        } else {
+            throw new Error(`Failed to get file content: ${response.status}`);
+        }
     }
 };
 
