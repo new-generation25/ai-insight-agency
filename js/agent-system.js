@@ -1,5 +1,5 @@
 import { AGENT_PROMPTS } from './agent-prompts.js';
-import { CONFIG, getApiKey } from '../config.js';
+import { CONFIG } from '../config.js';
 
 class Manager {
     constructor() {
@@ -45,18 +45,9 @@ class Manager {
                 body: JSON.stringify(payload)
             });
 
-            // 서버리스 API가 없으면 (로컬 개발 시) 직접 호출
-            if (!response.ok && response.status === 404) {
-                const apiKey = getApiKey();
-                if (!apiKey) {
-                    return "⚠️ API 키가 설정되지 않았습니다.";
-                }
-                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
-                response = await fetch(url, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
+            if (!response.ok) {
+                const errorData = await response.json();
+                return `⚠️ API 호출 실패: ${errorData.error || response.statusText}`;
             }
 
             const data = await response.json();

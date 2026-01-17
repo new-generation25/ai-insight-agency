@@ -3,7 +3,7 @@
 // 코드에 키를 직접 입력하지 마세요!
 
 export const CONFIG = {
-    // Gemini API - Vercel 환경변수: GEMINI_API_KEY
+    // Gemini API - Vercel 환경변수(GEMINI_API_KEY)를 통해 서버측에서 처리되므로 비워둡니다.
     GEMINI_API_KEY: '',
 
     // Google Drive OAuth Client ID
@@ -15,13 +15,3 @@ export const CONFIG = {
     // HTTP 리퍼러(도메인) 제한 설정을 해야 안전합니다! (예: ai-insight-agency.vercel.app)
     DRIVE_API_KEY: ''
 };
-
-// 로컬스토리지에서 API 키 불러오기 (로컬 개발용)
-export function getApiKey() {
-    return localStorage.getItem('gemini_api_key') || CONFIG.GEMINI_API_KEY;
-}
-
-// API 키 저장
-export function setApiKey(key) {
-    localStorage.setItem('gemini_api_key', key);
-}
