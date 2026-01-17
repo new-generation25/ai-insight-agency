@@ -10,6 +10,34 @@ class Manager {
             conversation_history: [],
             draft: null
         };
+        this.loadState();
+    }
+
+    saveState() {
+        localStorage.setItem('agent_state', JSON.stringify(this.state));
+    }
+
+    loadState() {
+        const saved = localStorage.getItem('agent_state');
+        if (saved) {
+            try {
+                this.state = JSON.parse(saved);
+                console.log("Agent state restored:", this.state.current_phase);
+            } catch (e) {
+                console.error("Failed to load agent state", e);
+            }
+        }
+    }
+
+    getLogData() {
+        return {
+            timestamp: new Date().toISOString(),
+            url: window.location.href,
+            session_id: this.state.session_id,
+            current_phase: this.state.current_phase,
+            collected_info: this.state.collected_info,
+            conversation_history: this.state.conversation_history
+        };
     }
 
     async callGemini(systemPrompt, userMessage) {
@@ -61,7 +89,7 @@ class Manager {
             }
 
             const text = data.candidates[0].content.parts[0].text;
-            this.saveState(); // Save state after successful API call
+            this.saveState(); // Save state 후반부 보정
             return text;
         } catch (error) {
             console.error("Gemini API Error:", error);
@@ -77,7 +105,7 @@ class Manager {
         if (isFileUpload || isBinaryUpload) {
             addMessage('system', "📂 파일을 확인했어요! 분석 중...", '🎩');
             this.state.current_phase = "분석";
-            window.updateProgressStage('analysis');
+            if (window.updateProgressStage) window.updateProgressStage('analysis');
         }
 
         // 사용자 메시지를 히스토리에 추가
@@ -122,14 +150,14 @@ class Manager {
 
         if (lower.includes('질문') || lower.includes('알려주') || lower.includes('어떤')) {
             this.state.current_phase = "인터뷰";
-            window.updateProgressStage('interview');
+            if (window.updateProgressStage) window.updateProgressStage('interview');
         } else if (lower.includes('# ') && lower.includes('##')) {
             this.state.current_phase = "작성";
-            window.updateProgressStage('drafting');
+            if (window.updateProgressStage) window.updateProgressStage('drafting');
             this.state.draft = response;
         } else if (lower.includes('개선') || lower.includes('수정')) {
             this.state.current_phase = "다듬기";
-            window.updateProgressStage('refinement');
+            if (window.updateProgressStage) window.updateProgressStage('refinement');
         }
     }
 
@@ -155,6 +183,7 @@ class Manager {
             conversation_history: [],
             draft: null
         };
+        localStorage.removeItem('agent_state');
     }
 }
 
