@@ -86,9 +86,8 @@ export const DriveAPI = {
     },
 
     // Find or Create specific folder
-    getOrCreateFolder: async (folderName) => {
-        // Query to check if folder exists
-        const q = `mimeType='application/vnd.google-apps.folder' and name='${folderName}' and trashed=false`;
+    getOrCreateFolder: async (folderName, parentId = 'root') => {
+        const q = `mimeType='application/vnd.google-apps.folder' and name='${folderName}' and '${parentId}' in parents and trashed=false`;
         const url = `https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(q)}`;
 
         try {
@@ -99,14 +98,12 @@ export const DriveAPI = {
             const data = await response.json();
 
             if (data.files && data.files.length > 0) {
-                // Folder exists, return its ID
                 return data.files[0].id;
             } else {
-                // Determine Root Folder (optional, here we treat 'root' as implied parent)
-                // Create the folder
                 const metadata = {
                     name: folderName,
-                    mimeType: 'application/vnd.google-apps.folder'
+                    mimeType: 'application/vnd.google-apps.folder',
+                    parents: [parentId]
                 };
                 const createRes = await fetch('https://www.googleapis.com/drive/v3/files', {
                     method: 'POST',
@@ -121,7 +118,7 @@ export const DriveAPI = {
             }
         } catch (error) {
             console.error("Error getting folder", error);
-            return null; // Fallback to root if fails
+            return null;
         }
     },
 
@@ -184,16 +181,14 @@ export const DriveAPI = {
     listFiles: async (folderName = 'AI_Agency_Projects/Logs') => {
         if (!DriveAPI.accessToken) await DriveAPI.authenticate();
 
-        // Find folder ID first
-        let folderId = null;
-        if (folderName.includes('/')) {
-            const parts = folderName.split('/');
-            for (const part of parts) {
-                folderId = await DriveAPI.getOrCreateFolder(part);
-            }
-        } else {
-            folderId = await DriveAPI.getOrCreateFolder(folderName);
+        // Find folder ID first (sequential parent traversal)
+        const parts = folderName.split('/');
+        let parentId = 'root';
+        for (const part of parts) {
+            parentId = await DriveAPI.getOrCreateFolder(part, parentId);
+            if (!parentId) throw new Error(`Folder not found: ${part}`);
         }
+        const folderId = parentId;
 
         const q = `'${folderId}' in parents and trashed=false`;
         const url = `https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(q)}&fields=files(id,name,mimeType,createdTime)&orderBy=createdTime desc`;
