@@ -9,7 +9,7 @@ export const CONFIG = {
     // Google Drive OAuth Client ID
     // ⚠️ 중요: 구글 로그인은 브라우저에서 직접 실행되므로 여기에 클라이언트 ID를 직접 입력해야 합니다.
     // (입력 후 구글 콘솔에서 도메인 제한 설정을 하시면 노출되어도 안전합니다.)
-    DRIVE_CLIENT_ID: '',
+    DRIVE_CLIENT_ID: '940235045410-th4q6b4ba73khpb5btgppa3ioopel6am.apps.googleusercontent.com',
 
     // Drive API Key - 새로 발급 후 반드시 [구글 클라우드 콘솔]에서 
     // HTTP 리퍼러(도메인) 제한 설정을 해야 안전합니다! (예: ai-insight-agency.vercel.app)
