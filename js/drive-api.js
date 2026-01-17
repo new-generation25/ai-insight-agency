@@ -178,6 +178,12 @@ export const DriveAPI = {
 
             xhr.send(form);
         });
+    },
+
+    // Simple Upload for Text/Markdown (Existing main.js compatibility)
+    uploadFile: async (fileName, content, folderName = 'AI_Agency_Projects') => {
+        const fileObj = new File([content], fileName, { type: 'text/markdown' });
+        return DriveAPI.uploadFileProgress(fileObj, folderName);
     }
 };
 

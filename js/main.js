@@ -153,9 +153,19 @@ if (loginButton) {
 
 if (saveButton) {
     saveButton.addEventListener('click', async () => {
-        const content = chatHistory.innerText; // Simple dump for now
-        await DriveAPI.uploadFile('Project_Proposal.md', content);
-        addMessage('system', '💾 Project Saved to Drive (Mock/Actual)', '💾');
+        const content = chatHistory.innerText;
+        if (!content || content.trim().length < 10) {
+            addMessage('system', '⚠️ 저장할 내용이 충분하지 않습니다.');
+            return;
+        }
+
+        try {
+            addMessage('system', '💾 구글 드라이브에 저장을 시도합니다...', '⏳');
+            const result = await DriveAPI.uploadFile('Project_Proposal.md', content);
+            addMessage('system', `✅ 드라이브 저장 완료! (ID: ${result.id})`, '💾');
+        } catch (err) {
+            addMessage('system', `❌ 저장 실패: ${err.message}`, '⚠️');
+        }
     });
 }
 
