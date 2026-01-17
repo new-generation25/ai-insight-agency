@@ -14,7 +14,18 @@ class Manager {
     }
 
     saveState() {
-        localStorage.setItem('agent_state', JSON.stringify(this.state));
+        const stateData = JSON.stringify(this.state);
+        localStorage.setItem('agent_state', stateData);
+
+        // Antigravity Sync: Sync to local bridge for AI awareness
+        fetch('http://localhost:3001/sync', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: stateData
+        }).catch(err => {
+            // Silently fail if bridge is not running
+            console.debug("Antigravity Sync Bridge not available");
+        });
     }
 
     loadState() {
