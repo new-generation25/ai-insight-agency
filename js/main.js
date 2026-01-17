@@ -153,18 +153,27 @@ if (loginButton) {
 
 if (saveButton) {
     saveButton.addEventListener('click', async () => {
-        const content = chatHistory.innerText;
-        if (!content || content.trim().length < 10) {
-            addMessage('system', '⚠️ 저장할 내용이 충분하지 않습니다.');
-            return;
-        }
+        if (!window.manager) return;
+
+        const logData = window.manager.getLogData();
+        const content = JSON.stringify(logData, null, 2);
+        const fileName = `log_${new Date().toISOString().replace(/[:.]/g, '-')}.json`;
 
         try {
-            addMessage('system', '💾 구글 드라이브에 저장을 시도합니다...', '⏳');
-            const result = await DriveAPI.uploadFile('Project_Proposal.md', content);
-            addMessage('system', `✅ 드라이브 저장 완료! (ID: ${result.id})`, '💾');
+            addMessage('system', '📊 대화 로그 및 흐름 데이터를 백업합니다...', '⏳');
+            const result = await DriveAPI.uploadFile(fileName, content, 'AI_Agency_Projects/Logs');
+            addMessage('system', `✅ 로그 백업 완료! (파일명: ${fileName})`, '💾');
+            addMessage('system', '💡 이 파일을 나중에 AI(Antigravity)에게 전달해 주시면 이전 대화 내용을 완벽히 파악할 수 있어요.');
         } catch (err) {
-            addMessage('system', `❌ 저장 실패: ${err.message}`, '⚠️');
+            console.error("Log upload failed", err);
+            // Fallback: Download file
+            const blob = new Blob([content], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = fileName;
+            a.click();
+            addMessage('system', `⚠️ 드라이브 저장 실패로 로그 파일이 다운로드되었습니다.`, '📥');
         }
     });
 }

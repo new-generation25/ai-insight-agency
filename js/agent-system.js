@@ -60,7 +60,9 @@ class Manager {
                 return "응답을 받지 못했어요. 다시 시도해주세요.";
             }
 
-            return data.candidates[0].content.parts[0].text;
+            const text = data.candidates[0].content.parts[0].text;
+            this.saveState(); // Save state after successful API call
+            return text;
         } catch (error) {
             console.error("Gemini API Error:", error);
             return `연결 오류가 발생했어요: ${error.message}`;
@@ -132,11 +134,17 @@ class Manager {
     }
 
     addToHistory(role, content) {
-        this.state.conversation_history.push({ role, content });
-        // 히스토리 길이 제한 (최근 20개만 유지)
-        if (this.state.conversation_history.length > 20) {
-            this.state.conversation_history = this.state.conversation_history.slice(-20);
+        this.state.conversation_history.push({
+            role,
+            content,
+            timestamp: new Date().toISOString(),
+            phase: this.state.current_phase
+        });
+        // 히스토리 길이 제한 (최근 50개로 확장)
+        if (this.state.conversation_history.length > 50) {
+            this.state.conversation_history = this.state.conversation_history.slice(-50);
         }
+        this.saveState();
     }
 
     reset() {
@@ -152,5 +160,6 @@ class Manager {
 
 // Global exposure for main.js interaction
 const manager = new Manager();
+window.manager = manager;
 window.processUserMessage = (msg) => manager.processUserMessage(msg);
 window.resetManager = () => manager.reset();
